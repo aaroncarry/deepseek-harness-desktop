@@ -1,5 +1,7 @@
 # DeepSeek Harness Desktop
 
+[简体中文](README.zh-CN.md)
+
 Electron desktop host for a DeepSeek Harness Web runtime. The renderer is the existing Harness Web product; this project owns the desktop window, a dedicated Harness home, sidecar lifecycle, diagnostics, and platform packaging.
 
 ## Development
