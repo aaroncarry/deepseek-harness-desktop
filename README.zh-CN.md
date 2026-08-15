@@ -38,7 +38,7 @@ pnpm dist:win
 
 stage 命令会解析 Harness 锁定的生产依赖图，将 pnpm 链接物化为普通目录，加入 assembled profile 所需的本地 peer package，并复制到 `resources/runtime/`。macOS 打包需要使用对应的 macOS Node.js 发行版，并在 macOS 上运行相同的命令。安装后的用户不需要另外安装 Node.js 或 pnpm。
 
-项目内置的 GitHub Actions 工作流会在每次变更时运行 Windows、Apple Silicon macOS 和 Intel macOS 检查。手动触发的打包任务当前只生成 Windows NSIS 安装程序；macOS 打包将在后续单独处理原生 DMG 工具链后启用。触发工作流时可通过 `harness_ref` 指定要打包的 Harness 版本。
+项目内置的 GitHub Actions 工作流会在每次变更时运行 Windows、Apple Silicon macOS 和 Intel macOS 检查。手动触发的打包任务会检出指定的 Harness revision，生成 Windows NSIS 安装程序，以及 Apple Silicon 和 Intel macOS 磁盘映像。触发工作流时可通过 `harness_ref` 指定要打包的 Harness 版本。
 
 ## 安全模型
 

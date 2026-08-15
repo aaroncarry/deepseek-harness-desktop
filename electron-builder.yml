@@ -9,6 +9,7 @@ files:
   - dist/**
   - assets/harness-orca.svg
   - assets/harness-orca.ico
+  - assets/harness-orca.icns
   - package.json
 asar: true
 asarUnpack:
@@ -20,7 +21,7 @@ extraResources:
     filter:
       - '**/*'
 mac:
-  icon: assets/harness-orca.svg
+  icon: assets/harness-orca.icns
   identity: null
   target:
     - dmg

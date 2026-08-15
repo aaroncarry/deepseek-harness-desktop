@@ -41,8 +41,12 @@ jobs:
           - name: windows-x64
             os: windows-latest
             platform: windows
-          # macOS packaging is intentionally disabled until its native DMG
-          # toolchain is handled separately. macOS remains covered by tests.
+          - name: macos-arm64
+            os: macos-14
+            platform: macos
+          - name: macos-x64
+            os: macos-15-intel
+            platform: macos
     steps:
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4

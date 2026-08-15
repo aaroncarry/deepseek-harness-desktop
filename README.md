@@ -38,7 +38,7 @@ pnpm dist:win
 
 The stage command resolves Harness's locked production graph, materializes pnpm links into ordinary directories, includes local peer packages required by the assembled profile, and copies the closure into `resources/runtime/`. macOS uses the corresponding macOS Node distribution and runs the same command on macOS. Both installers use the self-contained runtime; the end-user machine does not need Node or pnpm.
 
-The included GitHub Actions workflow runs checks on Windows, Apple Silicon macOS, and Intel macOS for each change. Its manual packaging job currently creates the Windows NSIS installer; macOS packaging remains disabled until its native DMG toolchain is handled separately. Set the `harness_ref` input to the release revision being packaged.
+The included GitHub Actions workflow runs checks on Windows, Apple Silicon macOS, and Intel macOS for each change. Its manual packaging job checks out the matching Harness revision and creates a native NSIS installer plus separate Apple Silicon and Intel macOS disk images. Set the `harness_ref` input to the release revision being packaged.
 
 ## Security model
 
