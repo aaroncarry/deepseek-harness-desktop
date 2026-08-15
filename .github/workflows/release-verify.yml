@@ -63,7 +63,7 @@ jobs:
       - run: pnpm --dir deepseek-harness build
       - run: pnpm install --frozen-lockfile
       - name: Download Electron distribution
-        run: pnpm rebuild electron
+        run: pnpm exec install-electron
       - name: Verify Electron distribution
         run: |
           node -e "const fs=require('node:fs'); const path=require('node:path'); const p=path.join(path.dirname(require.resolve('electron/package.json')), 'dist'); if (!fs.existsSync(p)) throw new Error('Electron distribution missing: '+p); console.log(p)"
