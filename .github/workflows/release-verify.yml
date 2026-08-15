@@ -65,7 +65,8 @@ jobs:
       - name: Download Electron distribution
         run: pnpm rebuild electron
       - name: Verify Electron distribution
-        run: node -e "const fs=require('node:fs'); const path=require('node:path'); const p=path.join(path.dirname(require.resolve('electron/package.json')), 'dist'); if (!fs.existsSync(p)) throw new Error('Electron distribution missing: '+p); console.log(p)"
+        run: |
+          node -e "const fs=require('node:fs'); const path=require('node:path'); const p=path.join(path.dirname(require.resolve('electron/package.json')), 'dist'); if (!fs.existsSync(p)) throw new Error('Electron distribution missing: '+p); console.log(p)"
       - name: Stage Windows runtime
         if: matrix.platform == 'windows'
         shell: pwsh
