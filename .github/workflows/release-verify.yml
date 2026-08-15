@@ -6,9 +6,9 @@ on:
   workflow_dispatch:
     inputs:
       harness_ref:
-        description: DeepSeek Harness revision to package
+        description: DeepSeek Harness branch, tag, or commit to package
         required: false
-        default: main
+        default: master
 
 jobs:
   desktop-tests:
