@@ -103,8 +103,15 @@ for (const candidate of [sourceRoot, nodeRoot]) {
     throw new Error(`Runtime input is not a directory: ${candidate}`)
   }
 }
-const pnpmCli = await resolvePnpmCli()
 await rm(deployRoot, { recursive: true, force: true })
-run(process.execPath, [pnpmCli, '--dir', sourceRoot, '--config.inject-workspace-packages=true', '--filter', '@deepseek-ai/dsh', '--prod', 'deploy', '--ignore-scripts', deployRoot], sourceRoot)
+const deployArgs = ['--dir', sourceRoot, '--config.inject-workspace-packages=true', '--filter', '@deepseek-ai/dsh', '--prod', 'deploy', '--ignore-scripts', deployRoot]
+if (process.platform === 'win32') {
+  // Corepack's pnpm.cmd is the stable entry point on hosted Windows runners;
+  // its internal cache layout is not a public path that can be parsed.
+  execFileSync('pnpm.cmd', deployArgs, { cwd: sourceRoot, stdio: 'inherit', shell: true })
+} else {
+  const pnpmCli = await resolvePnpmCli()
+  run(process.execPath, [pnpmCli, ...deployArgs], sourceRoot)
+}
 await materializeDeployment()
 run(process.execPath, [resolve('scripts/prepare-runtime.mjs'), nodeRoot, flatRoot], process.cwd())
