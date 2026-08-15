@@ -15,8 +15,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "test:integration": "vitest run --config vitest.integration.config.ts",
-    "dist:win": "pnpm run build && electron-builder --win nsis",
-    "dist:mac": "pnpm run build && electron-builder --mac dmg",
+    "dist:win": "pnpm run build && electron-builder --win nsis --publish never",
+    "dist:mac": "pnpm run build && electron-builder --mac dmg --publish never",
     "prepare:runtime": "node scripts/prepare-runtime.mjs",
     "stage:runtime": "node scripts/stage-runtime.mjs"
   },
