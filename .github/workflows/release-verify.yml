@@ -110,6 +110,8 @@ jobs:
           pnpm test:integration
       - name: Package macOS disk image
         if: matrix.platform == 'macos'
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: 'false'
         run: pnpm dist:mac
       - name: Smoke-test unpacked macOS application
         if: matrix.platform == 'macos'
