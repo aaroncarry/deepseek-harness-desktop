@@ -1,5 +1,8 @@
 allowBuilds:
   # Vitest/Vite use esbuild's reviewed platform binary at runtime.
   esbuild: true
+  # Electron's install script downloads the platform Electron distribution
+  # required by electron-builder.
+  electron: true
   # Windows installer wrapping is not part of local development or our release flow.
   electron-winstaller: false
