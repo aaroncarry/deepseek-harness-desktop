@@ -66,7 +66,9 @@ jobs:
         if: matrix.platform == 'windows'
         shell: pwsh
         run: |
-          $nodeRoot = node -p "require('node:path').dirname(require('node:path').dirname(process.execPath))"
+          # Windows distributions place node.exe directly in the distribution
+          # directory; unlike macOS they do not have a bin/ node layer.
+          $nodeRoot = node -p "require('node:path').dirname(process.execPath)"
           pnpm stage:runtime "$env:GITHUB_WORKSPACE\deepseek-harness" $nodeRoot
       - name: Exercise Windows sidecar and staged runtime
         if: matrix.platform == 'windows'

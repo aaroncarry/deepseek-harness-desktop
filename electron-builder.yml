@@ -1,7 +1,7 @@
 appId: ai.deepseek.harness.desktop
 productName: DeepSeek Harness Desktop
 electronDist: node_modules/electron/dist
-icon: assets/harness-orca.ico
+icon: assets/harness-orca.svg
 afterPack: ./scripts/after-pack.mjs
 directories:
   output: release
@@ -20,10 +20,13 @@ extraResources:
     filter:
       - '**/*'
 mac:
+  icon: assets/harness-orca.svg
+  identity: null
   target:
     - dmg
   category: public.app-category.developer-tools
 win:
+  icon: assets/harness-orca.ico
   target:
     - nsis
   signAndEditExecutable: false
