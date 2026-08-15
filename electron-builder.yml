@@ -4,6 +4,7 @@ electronDist: node_modules/electron/dist
 icon: assets/harness-orca.svg
 directories:
   output: release
+compression: store
 files:
   - dist/**
   - assets/harness-orca.svg
