@@ -1,0 +1,121 @@
+name: Release verify
+
+on:
+  pull_request:
+  push:
+  workflow_dispatch:
+    inputs:
+      harness_ref:
+        description: DeepSeek Harness revision to package
+        required: false
+        default: main
+
+jobs:
+  desktop-tests:
+    name: Desktop tests (${{ matrix.os }})
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [windows-latest, macos-14, macos-15-intel]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: corepack enable
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm check
+      - run: pnpm test
+
+  package:
+    name: Package (${{ matrix.name }})
+    needs: desktop-tests
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: windows-x64
+            os: windows-latest
+            platform: windows
+          - name: macos-arm64
+            os: macos-14
+            platform: macos
+          - name: macos-x64
+            os: macos-15-intel
+            platform: macos
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/checkout@v4
+        with:
+          repository: aaroncarry/deepseek-harness
+          ref: ${{ inputs.harness_ref }}
+          path: deepseek-harness
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: corepack enable
+      - run: pnpm --dir deepseek-harness install --frozen-lockfile
+      - run: pnpm --dir deepseek-harness build
+      - run: pnpm install --frozen-lockfile
+      - name: Stage Windows runtime
+        if: matrix.platform == 'windows'
+        shell: pwsh
+        run: |
+          $nodeRoot = node -p "require('node:path').dirname(require('node:path').dirname(process.execPath))"
+          pnpm stage:runtime "$env:GITHUB_WORKSPACE\deepseek-harness" $nodeRoot
+      - name: Exercise Windows sidecar and staged runtime
+        if: matrix.platform == 'windows'
+        shell: pwsh
+        run: |
+          $env:DSH_DESKTOP_NODE = (Get-Command node).Source
+          $env:DSH_DESKTOP_DSH_BIN = "$env:GITHUB_WORKSPACE\deepseek-harness\apps\cli\lib\bin.js"
+          pnpm build
+          pnpm test:integration
+      - name: Package Windows installer
+        if: matrix.platform == 'windows'
+        run: pnpm dist:win
+      - name: Smoke-test unpacked Windows application
+        if: matrix.platform == 'windows'
+        shell: pwsh
+        run: |
+          $app = Get-ChildItem -LiteralPath release -Recurse -Filter 'DeepSeek Harness Desktop.exe' |
+            Where-Object { $_.FullName -match 'win-unpacked' } |
+            Select-Object -First 1
+          if ($null -eq $app) { throw 'electron-builder did not create the unpacked Windows application' }
+          $env:DSH_DESKTOP_TEST_EXIT_AFTER_LOAD = '1'
+          $process = Start-Process -FilePath $app.FullName -Wait -PassThru
+          if ($process.ExitCode -ne 0) { exit $process.ExitCode }
+      - name: Stage macOS runtime
+        if: matrix.platform == 'macos'
+        shell: bash
+        run: |
+          node_root="$(node -p "require('node:path').dirname(require('node:path').dirname(process.execPath))")"
+          pnpm stage:runtime "$GITHUB_WORKSPACE/deepseek-harness" "$node_root"
+      - name: Exercise macOS sidecar and staged runtime
+        if: matrix.platform == 'macos'
+        shell: bash
+        run: |
+          DSH_DESKTOP_NODE="$(command -v node)" \
+          DSH_DESKTOP_DSH_BIN="$GITHUB_WORKSPACE/deepseek-harness/apps/cli/lib/bin.js" \
+          pnpm build
+          DSH_DESKTOP_NODE="$(command -v node)" \
+          DSH_DESKTOP_DSH_BIN="$GITHUB_WORKSPACE/deepseek-harness/apps/cli/lib/bin.js" \
+          pnpm test:integration
+      - name: Package macOS disk image
+        if: matrix.platform == 'macos'
+        run: pnpm dist:mac
+      - name: Smoke-test unpacked macOS application
+        if: matrix.platform == 'macos'
+        shell: bash
+        run: |
+          app="$(find release -type f -path '*.app/Contents/MacOS/*' -perm -111 | head -n 1)"
+          test -n "$app" || { echo 'electron-builder did not create the unpacked macOS application' >&2; exit 1; }
+          DSH_DESKTOP_TEST_EXIT_AFTER_LOAD=1 "$app"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dsh-desktop-${{ matrix.name }}
+          path: release/*
+          if-no-files-found: error

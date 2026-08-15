@@ -1,0 +1,10 @@
+node_modules/
+dist/
+release/
+release-orca/
+resources/runtime/
+.desktop-stage/
+.deploy-test*/
+.runtime-probe*/
+*.log
+coverage/
