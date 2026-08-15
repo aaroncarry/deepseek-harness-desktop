@@ -5,6 +5,7 @@
   "description": "Desktop host for DeepSeek Harness",
   "author": "DeepSeek AI",
   "type": "module",
+  "packageManager": "pnpm@11.7.0",
   "main": "dist/main.js",
   "scripts": {
     "build": "tsc -p tsconfig.json",
